@@ -1,8 +1,8 @@
 {
-    "name": "wp-cli/checksum-command",
-    "type": "wp-cli-package",
+    "name": "fp-cli/checksum-command",
+    "type": "fp-cli-package",
     "description": "Verifies file integrity by comparing to published checksums.",
-    "homepage": "https://github.com/wp-cli/checksum-command",
+    "homepage": "https://github.com/fp-cli/checksum-command",
     "license": "MIT",
     "authors": [
         {
@@ -12,18 +12,18 @@
         }
     ],
     "require": {
-        "wp-cli/wp-cli": "^2.12"
+        "fp-cli/fp-cli": "^2.12"
     },
     "require-dev": {
-        "wp-cli/extension-command": "^1.2 || ^2",
-        "wp-cli/wp-cli-tests": "^5"
+        "fp-cli/extension-command": "^1.2 || ^2",
+        "fp-cli/fp-cli-tests": "^5"
     },
     "config": {
         "process-timeout": 7200,
         "sort-packages": true,
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
-            "johnpbloch/wordpress-core-installer": true,
+            "johnpbloch/finpress-core-installer": true,
             "phpstan/extension-installer": true
         },
         "lock": false
@@ -66,6 +66,6 @@
         ]
     },
     "support": {
-        "issues": "https://github.com/wp-cli/checksum-command/issues"
+        "issues": "https://github.com/fp-cli/checksum-command/issues"
     }
 }

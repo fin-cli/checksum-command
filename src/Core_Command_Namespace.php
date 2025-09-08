@@ -1,9 +1,9 @@
 <?php
 
-use WP_CLI\Dispatcher\CommandNamespace;
+use FP_CLI\Dispatcher\CommandNamespace;
 
 /**
- * Downloads, installs, updates, and manages a WordPress installation.
+ * Downloads, installs, updates, and manages a FinPress installation.
  */
 final class Core_Command_Namespace extends CommandNamespace {
 

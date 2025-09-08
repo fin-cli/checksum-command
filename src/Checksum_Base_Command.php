@@ -1,13 +1,13 @@
 <?php
 
-use WP_CLI\Utils;
+use FP_CLI\Utils;
 
 /**
  * Base command that all checksum commands rely on.
  *
- * @package wp-cli
+ * @package fp-cli
  */
-class Checksum_Base_Command extends WP_CLI_Command {
+class Checksum_Base_Command extends FP_CLI_Command {
 
 	/**
 	 * Normalizes directory separators to slashes.
@@ -43,7 +43,7 @@ class Checksum_Base_Command extends WP_CLI_Command {
 		if ( 200 === $response->status_code ) {
 			return $response->body;
 		}
-		WP_CLI::error( "Couldn't fetch response from {$url} (HTTP code {$response->status_code})." );
+		FP_CLI::error( "Couldn't fetch response from {$url} (HTTP code {$response->status_code})." );
 	}
 
 	/**
@@ -77,7 +77,7 @@ class Checksum_Base_Command extends WP_CLI_Command {
 				}
 			}
 		} catch ( Exception $e ) {
-			WP_CLI::error( $e->getMessage() );
+			FP_CLI::error( $e->getMessage() );
 		}
 
 		return $filtered_files;

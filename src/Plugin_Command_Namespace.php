@@ -1,6 +1,6 @@
 <?php
 
-use WP_CLI\Dispatcher\CommandNamespace;
+use FP_CLI\Dispatcher\CommandNamespace;
 
 /**
  * Manages plugins, including installs, activations, and updates.

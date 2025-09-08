@@ -1,9 +1,9 @@
 <?php
 
-namespace WP_CLI\Fetchers;
+namespace FP_CLI\Fetchers;
 
 /**
- * Fetch a WordPress plugin based on one of its attributes.
+ * Fetch a FinPress plugin based on one of its attributes.
  *
  * This is a special version of the plugin fetcher. It doesn't use the
  * `all_plugins` filter, so that plugins cannot hide themselves from the

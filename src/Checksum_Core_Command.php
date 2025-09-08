@@ -1,13 +1,13 @@
 <?php
 
-use WP_CLI\Formatter;
-use WP_CLI\Utils;
-use WP_CLI\WpOrgApi;
+use FP_CLI\Formatter;
+use FP_CLI\Utils;
+use FP_CLI\WpOrgApi;
 
 /**
  * Verifies core file integrity by comparing to published checksums.
  *
- * @package wp-cli
+ * @package fp-cli
  */
 class Checksum_Core_Command extends Checksum_Base_Command {
 
@@ -33,12 +33,12 @@ class Checksum_Core_Command extends Checksum_Base_Command {
 	private $errors = [];
 
 	/**
-	 * Verifies WordPress files against WordPress.org's checksums.
+	 * Verifies FinPress files against FinPress.org's checksums.
 	 *
-	 * Downloads md5 checksums for the current version from WordPress.org, and
+	 * Downloads md5 checksums for the current version from FinPress.org, and
 	 * compares those checksums against the currently installed files.
 	 *
-	 * For security, avoids loading WordPress when verifying checksums.
+	 * For security, avoids loading FinPress when verifying checksums.
 	 *
 	 * If you experience issues verifying from this command, ensure you are
 	 * passing the relevant `--locale` and `--version` arguments according to
@@ -48,13 +48,13 @@ class Checksum_Core_Command extends Checksum_Base_Command {
 	 * ## OPTIONS
 	 *
 	 * [--include-root]
-	 * : Verify all files and folders in the root directory, and warn if any non-WordPress items are found.
+	 * : Verify all files and folders in the root directory, and warn if any non-FinPress items are found.
 	 *
 	 * [--version=<version>]
-	 * : Verify checksums against a specific version of WordPress.
+	 * : Verify checksums against a specific version of FinPress.
 	 *
 	 * [--locale=<locale>]
-	 * : Verify checksums against a specific locale of WordPress.
+	 * : Verify checksums against a specific locale of FinPress.
 	 *
 	 * [--insecure]
 	 * : Retry downloads without certificate validation if TLS handshake fails. Note: This makes the request vulnerable to a MITM attack.
@@ -78,41 +78,41 @@ class Checksum_Core_Command extends Checksum_Base_Command {
 	 * ## EXAMPLES
 	 *
 	 *     # Verify checksums
-	 *     $ wp core verify-checksums
-	 *     Success: WordPress installation verifies against checksums.
+	 *     $ fp core verify-checksums
+	 *     Success: FinPress installation verifies against checksums.
 	 *
-	 *     # Verify checksums for given WordPress version
-	 *     $ wp core verify-checksums --version=4.0
-	 *     Success: WordPress installation verifies against checksums.
-	 *
-	 *     # Verify checksums for given locale
-	 *     $ wp core verify-checksums --locale=en_US
-	 *     Success: WordPress installation verifies against checksums.
+	 *     # Verify checksums for given FinPress version
+	 *     $ fp core verify-checksums --version=4.0
+	 *     Success: FinPress installation verifies against checksums.
 	 *
 	 *     # Verify checksums for given locale
-	 *     $ wp core verify-checksums --locale=ja
-	 *     Warning: File doesn't verify against checksum: wp-includes/version.php
+	 *     $ fp core verify-checksums --locale=en_US
+	 *     Success: FinPress installation verifies against checksums.
+	 *
+	 *     # Verify checksums for given locale
+	 *     $ fp core verify-checksums --locale=ja
+	 *     Warning: File doesn't verify against checksum: fp-includes/version.php
 	 *     Warning: File doesn't verify against checksum: readme.html
-	 *     Warning: File doesn't verify against checksum: wp-config-sample.php
-	 *     Error: WordPress installation doesn't verify against checksums.
+	 *     Warning: File doesn't verify against checksum: fp-config-sample.php
+	 *     Error: FinPress installation doesn't verify against checksums.
 	 *
 	 *     # Verify checksums and exclude files
-	 *     $ wp core verify-checksums --exclude="readme.html"
-	 *     Success: WordPress installation verifies against checksums.
+	 *     $ fp core verify-checksums --exclude="readme.html"
+	 *     Success: FinPress installation verifies against checksums.
 	 *
 	 *     # Verify checksums with formatted output
-	 *     $ wp core verify-checksums --format=json
+	 *     $ fp core verify-checksums --format=json
 	 *     [{"file":"readme.html","message":"File doesn't verify against checksum"}]
-	 *     Error: WordPress installation doesn't verify against checksums.
+	 *     Error: FinPress installation doesn't verify against checksums.
 	 *
-	 * @when before_wp_load
+	 * @when before_fp_load
 	 */
 	public function __invoke( $args, $assoc_args ) {
-		$wp_version = '';
+		$fp_version = '';
 		$locale     = '';
 
 		if ( ! empty( $assoc_args['version'] ) ) {
-			$wp_version = $assoc_args['version'];
+			$fp_version = $assoc_args['version'];
 		}
 
 		if ( ! empty( $assoc_args['locale'] ) ) {
@@ -129,32 +129,32 @@ class Checksum_Core_Command extends Checksum_Base_Command {
 			$this->exclude_files = explode( ',', $exclude );
 		}
 
-		if ( empty( $wp_version ) ) {
-			$details    = self::get_wp_details();
-			$wp_version = $details['wp_version'];
+		if ( empty( $fp_version ) ) {
+			$details    = self::get_fp_details();
+			$fp_version = $details['fp_version'];
 
 			if ( empty( $locale ) ) {
-				$locale = $details['wp_local_package'];
+				$locale = $details['fp_local_package'];
 			}
 		}
 
 		$insecure   = Utils\get_flag_value( $assoc_args, 'insecure', false );
-		$wp_org_api = new WpOrgApi( [ 'insecure' => $insecure ] );
+		$fp_org_api = new WpOrgApi( [ 'insecure' => $insecure ] );
 
 		try {
-			$checksums = $wp_org_api->get_core_checksums( $wp_version, empty( $locale ) ? 'en_US' : $locale );
+			$checksums = $fp_org_api->get_core_checksums( $fp_version, empty( $locale ) ? 'en_US' : $locale );
 		} catch ( Exception $exception ) {
-			WP_CLI::error( $exception );
+			FP_CLI::error( $exception );
 		}
 
 		if ( ! is_array( $checksums ) ) {
-			WP_CLI::error( "Couldn't get checksums from WordPress.org." );
+			FP_CLI::error( "Couldn't get checksums from FinPress.org." );
 		}
 
 		$has_errors = false;
 		foreach ( $checksums as $file => $checksum ) {
 			// Skip files which get updated
-			if ( 'wp-content' === substr( $file, 0, 10 ) ) {
+			if ( 'fp-content' === substr( $file, 0, 10 ) ) {
 				continue;
 			}
 
@@ -204,7 +204,7 @@ class Checksum_Core_Command extends Checksum_Base_Command {
 		if ( ! empty( $this->errors ) ) {
 			if ( ! isset( $assoc_args['format'] ) || 'plain' === $assoc_args['format'] ) {
 				foreach ( $this->errors as $error ) {
-					WP_CLI::warning( sprintf( '%s: %s', $error['message'], $error['file'] ) );
+					FP_CLI::warning( sprintf( '%s: %s', $error['message'], $error['file'] ) );
 				}
 			} else {
 				$formatter = new Formatter(
@@ -216,9 +216,9 @@ class Checksum_Core_Command extends Checksum_Base_Command {
 		}
 
 		if ( ! $has_errors ) {
-			WP_CLI::success( 'WordPress installation verifies against checksums.' );
+			FP_CLI::success( 'FinPress installation verifies against checksums.' );
 		} else {
-			WP_CLI::error( "WordPress installation doesn't verify against checksums." );
+			FP_CLI::error( "FinPress installation doesn't verify against checksums." );
 		}
 	}
 
@@ -231,38 +231,38 @@ class Checksum_Core_Command extends Checksum_Base_Command {
 	 */
 	protected function filter_file( $filepath ) {
 		if ( true === $this->include_root ) {
-			return ( 1 !== preg_match( '/^(\.htaccess$|\.maintenance$|wp-config\.php$|wp-content\/)/', $filepath ) );
+			return ( 1 !== preg_match( '/^(\.htaccess$|\.maintenance$|fp-config\.php$|fp-content\/)/', $filepath ) );
 		}
 
-		return ( 0 === strpos( $filepath, 'wp-admin/' )
-			|| 0 === strpos( $filepath, 'wp-includes/' )
-			|| 1 === preg_match( '/^wp-(?!config\.php)([^\/]*)$/', $filepath )
+		return ( 0 === strpos( $filepath, 'fp-admin/' )
+			|| 0 === strpos( $filepath, 'fp-includes/' )
+			|| 1 === preg_match( '/^fp-(?!config\.php)([^\/]*)$/', $filepath )
 		);
 	}
 
 	/**
-	 * Gets version information from `wp-includes/version.php`.
+	 * Gets version information from `fp-includes/version.php`.
 	 *
 	 * @return array {
-	 *     @type string $wp_version The WordPress version.
-	 *     @type int $wp_db_version The WordPress DB revision.
+	 *     @type string $fp_version The FinPress version.
+	 *     @type int $fp_db_version The FinPress DB revision.
 	 *     @type string $tinymce_version The TinyMCE version.
-	 *     @type string $wp_local_package The TinyMCE version.
+	 *     @type string $fp_local_package The TinyMCE version.
 	 * }
 	 */
-	private static function get_wp_details() {
-		$versions_path = ABSPATH . 'wp-includes/version.php';
+	private static function get_fp_details() {
+		$versions_path = ABSPATH . 'fp-includes/version.php';
 
 		if ( ! is_readable( $versions_path ) ) {
-			WP_CLI::error(
-				"This does not seem to be a WordPress install.\n" .
-				'Pass --path=`path/to/wordpress` or run `wp core download`.'
+			FP_CLI::error(
+				"This does not seem to be a FinPress install.\n" .
+				'Pass --path=`path/to/finpress` or run `fp core download`.'
 			);
 		}
 
 		$version_content = (string) file_get_contents( $versions_path, false, null, 6, 2048 );
 
-		$vars   = [ 'wp_version', 'wp_db_version', 'tinymce_version', 'wp_local_package' ];
+		$vars   = [ 'fp_version', 'fp_db_version', 'tinymce_version', 'fp_local_package' ];
 		$result = [];
 
 		foreach ( $vars as $var_name ) {

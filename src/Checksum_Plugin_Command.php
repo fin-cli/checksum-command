@@ -1,14 +1,14 @@
 <?php
 
-use WP_CLI\Fetchers;
-use WP_CLI\Formatter;
-use WP_CLI\Utils;
-use WP_CLI\WpOrgApi;
+use FP_CLI\Fetchers;
+use FP_CLI\Formatter;
+use FP_CLI\Utils;
+use FP_CLI\WpOrgApi;
 
 /**
  * Verifies plugin file integrity by comparing to published checksums.
  *
- * @package wp-cli
+ * @package fp-cli
  */
 class Checksum_Plugin_Command extends Checksum_Base_Command {
 
@@ -27,7 +27,7 @@ class Checksum_Plugin_Command extends Checksum_Base_Command {
 	private $errors = array();
 
 	/**
-	 * Verifies plugin files against WordPress.org's checksums.
+	 * Verifies plugin files against FinPress.org's checksums.
 	 *
 	 * ## OPTIONS
 	 *
@@ -65,11 +65,11 @@ class Checksum_Plugin_Command extends Checksum_Base_Command {
 	 * ## EXAMPLES
 	 *
 	 *     # Verify the checksums of all installed plugins
-	 *     $ wp plugin verify-checksums --all
+	 *     $ fp plugin verify-checksums --all
 	 *     Success: Verified 8 of 8 plugins.
 	 *
 	 *     # Verify the checksums of a single plugin, Akismet in this case
-	 *     $ wp plugin verify-checksums akismet
+	 *     $ fp plugin verify-checksums akismet
 	 *     Success: Verified 1 of 1 plugins.
 	 */
 	public function __invoke( $args, $assoc_args ) {
@@ -87,7 +87,7 @@ class Checksum_Plugin_Command extends Checksum_Base_Command {
 		$version_arg = isset( $assoc_args['version'] ) ? $assoc_args['version'] : '';
 
 		if ( empty( $plugins ) && ! $all ) {
-			WP_CLI::error( 'You need to specify either one or more plugin slugs to check or use the --all flag to check all plugins.' );
+			FP_CLI::error( 'You need to specify either one or more plugin slugs to check or use the --all flag to check all plugins.' );
 		}
 
 		$exclude_list = explode( ',', $exclude );
@@ -108,25 +108,25 @@ class Checksum_Plugin_Command extends Checksum_Base_Command {
 			}
 
 			if ( false === $version ) {
-				WP_CLI::warning( "Could not retrieve the version for plugin {$plugin->name}, skipping." );
+				FP_CLI::warning( "Could not retrieve the version for plugin {$plugin->name}, skipping." );
 				++$skips;
 				continue;
 			}
 
-			$wp_org_api = new WpOrgApi( [ 'insecure' => $insecure ] );
+			$fp_org_api = new WpOrgApi( [ 'insecure' => $insecure ] );
 
 			try {
 				/**
 				 * @var array|false $checksums
 				 */
-				$checksums = $wp_org_api->get_plugin_checksums( $plugin->name, $version );
+				$checksums = $fp_org_api->get_plugin_checksums( $plugin->name, $version );
 			} catch ( Exception $exception ) {
-				WP_CLI::warning( $exception->getMessage() );
+				FP_CLI::warning( $exception->getMessage() );
 				$checksums = false;
 			}
 
 			if ( false === $checksums ) {
-				WP_CLI::warning( "Could not retrieve the checksums for version {$version} of plugin {$plugin->name}, skipping." );
+				FP_CLI::warning( "Could not retrieve the checksums for version {$version} of plugin {$plugin->name}, skipping." );
 				++$skips;
 				continue;
 			}
@@ -173,23 +173,23 @@ class Checksum_Plugin_Command extends Checksum_Base_Command {
 
 	private function verify_hello_dolly_from_core( $assoc_args ) {
 		$file       = 'hello.php';
-		$wp_version = get_bloginfo( 'version', 'display' );
+		$fp_version = get_bloginfo( 'version', 'display' );
 		$insecure   = Utils\get_flag_value( $assoc_args, 'insecure', false );
-		$wp_org_api = new WpOrgApi( [ 'insecure' => $insecure ] );
+		$fp_org_api = new WpOrgApi( [ 'insecure' => $insecure ] );
 		$locale     = 'en_US';
 
 		try {
-			$checksums = $wp_org_api->get_core_checksums( $wp_version, $locale );
+			$checksums = $fp_org_api->get_core_checksums( $fp_version, $locale );
 		} catch ( Exception $exception ) {
-			WP_CLI::error( $exception );
+			FP_CLI::error( $exception );
 		}
 
-		if ( ! is_array( $checksums ) || ! isset( $checksums['wp-content/plugins/hello.php'] ) ) {
-			WP_CLI::error( "Couldn't get hello.php checksum from WordPress.org." );
+		if ( ! is_array( $checksums ) || ! isset( $checksums['fp-content/plugins/hello.php'] ) ) {
+			FP_CLI::error( "Couldn't get hello.php checksum from FinPress.org." );
 		}
 
 		$md5_file = md5_file( $this->get_absolute_path( '/' ) . $file );
-		if ( $md5_file !== $checksums['wp-content/plugins/hello.php'] ) {
+		if ( $md5_file !== $checksums['fp-content/plugins/hello.php'] ) {
 			$this->add_error( 'hello', $file, 'Checksum does not match' );
 		}
 	}
@@ -254,7 +254,7 @@ class Checksum_Plugin_Command extends Checksum_Base_Command {
 
 		// Return single file plugins immediately, to avoid iterating over the
 		// entire plugins folder.
-		if ( WP_PLUGIN_DIR === $folder ) {
+		if ( FP_PLUGIN_DIR === $folder ) {
 			return (array) $path;
 		}
 
@@ -332,7 +332,7 @@ class Checksum_Plugin_Command extends Checksum_Base_Command {
 	 * @return string
 	 */
 	private function get_absolute_path( $path ) {
-		return WP_PLUGIN_DIR . '/' . $path;
+		return FP_PLUGIN_DIR . '/' . $path;
 	}
 
 	/**
