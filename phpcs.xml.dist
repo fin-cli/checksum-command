@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="FP-CLI-checksum">
-	<description>Custom ruleset for FP-CLI checksum-command</description>
+<ruleset name="FIN-CLI-checksum">
+	<description>Custom ruleset for FIN-CLI checksum-command</description>
 
 	<!--
 	#############################################################################
@@ -24,11 +24,11 @@
 
 	<!--
 	#############################################################################
-	USE THE FP_CLI_CS RULESET
+	USE THE FIN_CLI_CS RULESET
 	#############################################################################
 	-->
 
-	<rule ref="FP_CLI_CS"/>
+	<rule ref="FIN_CLI_CS"/>
 
 	<!--
 	#############################################################################
@@ -45,8 +45,8 @@
 	<rule ref="FinPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="FP_CLI\Checksum"/><!-- Namespaces. -->
-				<element value="fpcli_checksum"/><!-- Global variables and such. -->
+				<element value="FIN_CLI\Checksum"/><!-- Namespaces. -->
+				<element value="fincli_checksum"/><!-- Global variables and such. -->
 			</property>
 		</properties>
 	</rule>
@@ -58,7 +58,7 @@
 	</rule>
 
 	<rule ref="FinPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound">
-		<exclude-pattern>*/src/FP_CLI/Fetchers/UnfilteredPlugin\.php$</exclude-pattern>
+		<exclude-pattern>*/src/FIN_CLI/Fetchers/UnfilteredPlugin\.php$</exclude-pattern>
 	</rule>
 
 </ruleset>

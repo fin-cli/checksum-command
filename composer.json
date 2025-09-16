@@ -1,8 +1,8 @@
 {
-    "name": "fp-cli/checksum-command",
-    "type": "fp-cli-package",
+    "name": "fin-cli/checksum-command",
+    "type": "fin-cli-package",
     "description": "Verifies file integrity by comparing to published checksums.",
-    "homepage": "https://github.com/fp-cli/checksum-command",
+    "homepage": "https://github.com/fin-cli/checksum-command",
     "license": "MIT",
     "authors": [
         {
@@ -12,11 +12,11 @@
         }
     ],
     "require": {
-        "fp-cli/fp-cli": "^2.12"
+        "fin-cli/fin-cli": "^2.12"
     },
     "require-dev": {
-        "fp-cli/extension-command": "^1.2 || ^2",
-        "fp-cli/fp-cli-tests": "^5"
+        "fin-cli/extension-command": "^1.2 || ^2",
+        "fin-cli/fin-cli-tests": "^5"
     },
     "config": {
         "process-timeout": 7200,
@@ -66,6 +66,6 @@
         ]
     },
     "support": {
-        "issues": "https://github.com/fp-cli/checksum-command/issues"
+        "issues": "https://github.com/fin-cli/checksum-command/issues"
     }
 }

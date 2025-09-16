@@ -1,13 +1,13 @@
 <?php
 
-use FP_CLI\Formatter;
-use FP_CLI\Utils;
-use FP_CLI\WpOrgApi;
+use FIN_CLI\Formatter;
+use FIN_CLI\Utils;
+use FIN_CLI\WpOrgApi;
 
 /**
  * Verifies core file integrity by comparing to published checksums.
  *
- * @package fp-cli
+ * @package fin-cli
  */
 class Checksum_Core_Command extends Checksum_Base_Command {
 
@@ -78,41 +78,41 @@ class Checksum_Core_Command extends Checksum_Base_Command {
 	 * ## EXAMPLES
 	 *
 	 *     # Verify checksums
-	 *     $ fp core verify-checksums
+	 *     $ fin core verify-checksums
 	 *     Success: FinPress installation verifies against checksums.
 	 *
 	 *     # Verify checksums for given FinPress version
-	 *     $ fp core verify-checksums --version=4.0
+	 *     $ fin core verify-checksums --version=4.0
 	 *     Success: FinPress installation verifies against checksums.
 	 *
 	 *     # Verify checksums for given locale
-	 *     $ fp core verify-checksums --locale=en_US
+	 *     $ fin core verify-checksums --locale=en_US
 	 *     Success: FinPress installation verifies against checksums.
 	 *
 	 *     # Verify checksums for given locale
-	 *     $ fp core verify-checksums --locale=ja
-	 *     Warning: File doesn't verify against checksum: fp-includes/version.php
+	 *     $ fin core verify-checksums --locale=ja
+	 *     Warning: File doesn't verify against checksum: fin-includes/version.php
 	 *     Warning: File doesn't verify against checksum: readme.html
-	 *     Warning: File doesn't verify against checksum: fp-config-sample.php
+	 *     Warning: File doesn't verify against checksum: fin-config-sample.php
 	 *     Error: FinPress installation doesn't verify against checksums.
 	 *
 	 *     # Verify checksums and exclude files
-	 *     $ fp core verify-checksums --exclude="readme.html"
+	 *     $ fin core verify-checksums --exclude="readme.html"
 	 *     Success: FinPress installation verifies against checksums.
 	 *
 	 *     # Verify checksums with formatted output
-	 *     $ fp core verify-checksums --format=json
+	 *     $ fin core verify-checksums --format=json
 	 *     [{"file":"readme.html","message":"File doesn't verify against checksum"}]
 	 *     Error: FinPress installation doesn't verify against checksums.
 	 *
-	 * @when before_fp_load
+	 * @when before_fin_load
 	 */
 	public function __invoke( $args, $assoc_args ) {
-		$fp_version = '';
+		$fin_version = '';
 		$locale     = '';
 
 		if ( ! empty( $assoc_args['version'] ) ) {
-			$fp_version = $assoc_args['version'];
+			$fin_version = $assoc_args['version'];
 		}
 
 		if ( ! empty( $assoc_args['locale'] ) ) {
@@ -129,32 +129,32 @@ class Checksum_Core_Command extends Checksum_Base_Command {
 			$this->exclude_files = explode( ',', $exclude );
 		}
 
-		if ( empty( $fp_version ) ) {
-			$details    = self::get_fp_details();
-			$fp_version = $details['fp_version'];
+		if ( empty( $fin_version ) ) {
+			$details    = self::get_fin_details();
+			$fin_version = $details['fin_version'];
 
 			if ( empty( $locale ) ) {
-				$locale = $details['fp_local_package'];
+				$locale = $details['fin_local_package'];
 			}
 		}
 
 		$insecure   = Utils\get_flag_value( $assoc_args, 'insecure', false );
-		$fp_org_api = new WpOrgApi( [ 'insecure' => $insecure ] );
+		$fin_org_api = new WpOrgApi( [ 'insecure' => $insecure ] );
 
 		try {
-			$checksums = $fp_org_api->get_core_checksums( $fp_version, empty( $locale ) ? 'en_US' : $locale );
+			$checksums = $fin_org_api->get_core_checksums( $fin_version, empty( $locale ) ? 'en_US' : $locale );
 		} catch ( Exception $exception ) {
-			FP_CLI::error( $exception );
+			FIN_CLI::error( $exception );
 		}
 
 		if ( ! is_array( $checksums ) ) {
-			FP_CLI::error( "Couldn't get checksums from FinPress.org." );
+			FIN_CLI::error( "Couldn't get checksums from FinPress.org." );
 		}
 
 		$has_errors = false;
 		foreach ( $checksums as $file => $checksum ) {
 			// Skip files which get updated
-			if ( 'fp-content' === substr( $file, 0, 10 ) ) {
+			if ( 'fin-content' === substr( $file, 0, 10 ) ) {
 				continue;
 			}
 
@@ -204,7 +204,7 @@ class Checksum_Core_Command extends Checksum_Base_Command {
 		if ( ! empty( $this->errors ) ) {
 			if ( ! isset( $assoc_args['format'] ) || 'plain' === $assoc_args['format'] ) {
 				foreach ( $this->errors as $error ) {
-					FP_CLI::warning( sprintf( '%s: %s', $error['message'], $error['file'] ) );
+					FIN_CLI::warning( sprintf( '%s: %s', $error['message'], $error['file'] ) );
 				}
 			} else {
 				$formatter = new Formatter(
@@ -216,9 +216,9 @@ class Checksum_Core_Command extends Checksum_Base_Command {
 		}
 
 		if ( ! $has_errors ) {
-			FP_CLI::success( 'FinPress installation verifies against checksums.' );
+			FIN_CLI::success( 'FinPress installation verifies against checksums.' );
 		} else {
-			FP_CLI::error( "FinPress installation doesn't verify against checksums." );
+			FIN_CLI::error( "FinPress installation doesn't verify against checksums." );
 		}
 	}
 
@@ -231,38 +231,38 @@ class Checksum_Core_Command extends Checksum_Base_Command {
 	 */
 	protected function filter_file( $filepath ) {
 		if ( true === $this->include_root ) {
-			return ( 1 !== preg_match( '/^(\.htaccess$|\.maintenance$|fp-config\.php$|fp-content\/)/', $filepath ) );
+			return ( 1 !== preg_match( '/^(\.htaccess$|\.maintenance$|fin-config\.php$|fin-content\/)/', $filepath ) );
 		}
 
-		return ( 0 === strpos( $filepath, 'fp-admin/' )
-			|| 0 === strpos( $filepath, 'fp-includes/' )
-			|| 1 === preg_match( '/^fp-(?!config\.php)([^\/]*)$/', $filepath )
+		return ( 0 === strpos( $filepath, 'fin-admin/' )
+			|| 0 === strpos( $filepath, 'fin-includes/' )
+			|| 1 === preg_match( '/^fin-(?!config\.php)([^\/]*)$/', $filepath )
 		);
 	}
 
 	/**
-	 * Gets version information from `fp-includes/version.php`.
+	 * Gets version information from `fin-includes/version.php`.
 	 *
 	 * @return array {
-	 *     @type string $fp_version The FinPress version.
-	 *     @type int $fp_db_version The FinPress DB revision.
+	 *     @type string $fin_version The FinPress version.
+	 *     @type int $fin_db_version The FinPress DB revision.
 	 *     @type string $tinymce_version The TinyMCE version.
-	 *     @type string $fp_local_package The TinyMCE version.
+	 *     @type string $fin_local_package The TinyMCE version.
 	 * }
 	 */
-	private static function get_fp_details() {
-		$versions_path = ABSPATH . 'fp-includes/version.php';
+	private static function get_fin_details() {
+		$versions_path = ABSPATH . 'fin-includes/version.php';
 
 		if ( ! is_readable( $versions_path ) ) {
-			FP_CLI::error(
+			FIN_CLI::error(
 				"This does not seem to be a FinPress install.\n" .
-				'Pass --path=`path/to/finpress` or run `fp core download`.'
+				'Pass --path=`path/to/finpress` or run `fin core download`.'
 			);
 		}
 
 		$version_content = (string) file_get_contents( $versions_path, false, null, 6, 2048 );
 
-		$vars   = [ 'fp_version', 'fp_db_version', 'tinymce_version', 'fp_local_package' ];
+		$vars   = [ 'fin_version', 'fin_db_version', 'tinymce_version', 'fin_local_package' ];
 		$result = [];
 
 		foreach ( $vars as $var_name ) {

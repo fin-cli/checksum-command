@@ -1,6 +1,6 @@
 <?php
 
-use FP_CLI\Dispatcher\CommandNamespace;
+use FIN_CLI\Dispatcher\CommandNamespace;
 
 /**
  * Manages plugins, including installs, activations, and updates.

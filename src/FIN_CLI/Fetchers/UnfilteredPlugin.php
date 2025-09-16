@@ -1,6 +1,6 @@
 <?php
 
-namespace FP_CLI\Fetchers;
+namespace FIN_CLI\Fetchers;
 
 /**
  * Fetch a FinPress plugin based on one of its attributes.

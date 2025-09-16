@@ -1,13 +1,13 @@
 <?php
 
-use FP_CLI\Utils;
+use FIN_CLI\Utils;
 
 /**
  * Base command that all checksum commands rely on.
  *
- * @package fp-cli
+ * @package fin-cli
  */
-class Checksum_Base_Command extends FP_CLI_Command {
+class Checksum_Base_Command extends FIN_CLI_Command {
 
 	/**
 	 * Normalizes directory separators to slashes.
@@ -43,7 +43,7 @@ class Checksum_Base_Command extends FP_CLI_Command {
 		if ( 200 === $response->status_code ) {
 			return $response->body;
 		}
-		FP_CLI::error( "Couldn't fetch response from {$url} (HTTP code {$response->status_code})." );
+		FIN_CLI::error( "Couldn't fetch response from {$url} (HTTP code {$response->status_code})." );
 	}
 
 	/**
@@ -77,7 +77,7 @@ class Checksum_Base_Command extends FP_CLI_Command {
 				}
 			}
 		} catch ( Exception $e ) {
-			FP_CLI::error( $e->getMessage() );
+			FIN_CLI::error( $e->getMessage() );
 		}
 
 		return $filtered_files;

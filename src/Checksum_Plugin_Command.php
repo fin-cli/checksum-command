@@ -1,14 +1,14 @@
 <?php
 
-use FP_CLI\Fetchers;
-use FP_CLI\Formatter;
-use FP_CLI\Utils;
-use FP_CLI\WpOrgApi;
+use FIN_CLI\Fetchers;
+use FIN_CLI\Formatter;
+use FIN_CLI\Utils;
+use FIN_CLI\WpOrgApi;
 
 /**
  * Verifies plugin file integrity by comparing to published checksums.
  *
- * @package fp-cli
+ * @package fin-cli
  */
 class Checksum_Plugin_Command extends Checksum_Base_Command {
 
@@ -65,11 +65,11 @@ class Checksum_Plugin_Command extends Checksum_Base_Command {
 	 * ## EXAMPLES
 	 *
 	 *     # Verify the checksums of all installed plugins
-	 *     $ fp plugin verify-checksums --all
+	 *     $ fin plugin verify-checksums --all
 	 *     Success: Verified 8 of 8 plugins.
 	 *
 	 *     # Verify the checksums of a single plugin, Akismet in this case
-	 *     $ fp plugin verify-checksums akismet
+	 *     $ fin plugin verify-checksums akismet
 	 *     Success: Verified 1 of 1 plugins.
 	 */
 	public function __invoke( $args, $assoc_args ) {
@@ -87,7 +87,7 @@ class Checksum_Plugin_Command extends Checksum_Base_Command {
 		$version_arg = isset( $assoc_args['version'] ) ? $assoc_args['version'] : '';
 
 		if ( empty( $plugins ) && ! $all ) {
-			FP_CLI::error( 'You need to specify either one or more plugin slugs to check or use the --all flag to check all plugins.' );
+			FIN_CLI::error( 'You need to specify either one or more plugin slugs to check or use the --all flag to check all plugins.' );
 		}
 
 		$exclude_list = explode( ',', $exclude );
@@ -108,25 +108,25 @@ class Checksum_Plugin_Command extends Checksum_Base_Command {
 			}
 
 			if ( false === $version ) {
-				FP_CLI::warning( "Could not retrieve the version for plugin {$plugin->name}, skipping." );
+				FIN_CLI::warning( "Could not retrieve the version for plugin {$plugin->name}, skipping." );
 				++$skips;
 				continue;
 			}
 
-			$fp_org_api = new WpOrgApi( [ 'insecure' => $insecure ] );
+			$fin_org_api = new WpOrgApi( [ 'insecure' => $insecure ] );
 
 			try {
 				/**
 				 * @var array|false $checksums
 				 */
-				$checksums = $fp_org_api->get_plugin_checksums( $plugin->name, $version );
+				$checksums = $fin_org_api->get_plugin_checksums( $plugin->name, $version );
 			} catch ( Exception $exception ) {
-				FP_CLI::warning( $exception->getMessage() );
+				FIN_CLI::warning( $exception->getMessage() );
 				$checksums = false;
 			}
 
 			if ( false === $checksums ) {
-				FP_CLI::warning( "Could not retrieve the checksums for version {$version} of plugin {$plugin->name}, skipping." );
+				FIN_CLI::warning( "Could not retrieve the checksums for version {$version} of plugin {$plugin->name}, skipping." );
 				++$skips;
 				continue;
 			}
@@ -173,23 +173,23 @@ class Checksum_Plugin_Command extends Checksum_Base_Command {
 
 	private function verify_hello_dolly_from_core( $assoc_args ) {
 		$file       = 'hello.php';
-		$fp_version = get_bloginfo( 'version', 'display' );
+		$fin_version = get_bloginfo( 'version', 'display' );
 		$insecure   = Utils\get_flag_value( $assoc_args, 'insecure', false );
-		$fp_org_api = new WpOrgApi( [ 'insecure' => $insecure ] );
+		$fin_org_api = new WpOrgApi( [ 'insecure' => $insecure ] );
 		$locale     = 'en_US';
 
 		try {
-			$checksums = $fp_org_api->get_core_checksums( $fp_version, $locale );
+			$checksums = $fin_org_api->get_core_checksums( $fin_version, $locale );
 		} catch ( Exception $exception ) {
-			FP_CLI::error( $exception );
+			FIN_CLI::error( $exception );
 		}
 
-		if ( ! is_array( $checksums ) || ! isset( $checksums['fp-content/plugins/hello.php'] ) ) {
-			FP_CLI::error( "Couldn't get hello.php checksum from FinPress.org." );
+		if ( ! is_array( $checksums ) || ! isset( $checksums['fin-content/plugins/hello.php'] ) ) {
+			FIN_CLI::error( "Couldn't get hello.php checksum from FinPress.org." );
 		}
 
 		$md5_file = md5_file( $this->get_absolute_path( '/' ) . $file );
-		if ( $md5_file !== $checksums['fp-content/plugins/hello.php'] ) {
+		if ( $md5_file !== $checksums['fin-content/plugins/hello.php'] ) {
 			$this->add_error( 'hello', $file, 'Checksum does not match' );
 		}
 	}
@@ -254,7 +254,7 @@ class Checksum_Plugin_Command extends Checksum_Base_Command {
 
 		// Return single file plugins immediately, to avoid iterating over the
 		// entire plugins folder.
-		if ( FP_PLUGIN_DIR === $folder ) {
+		if ( FIN_PLUGIN_DIR === $folder ) {
 			return (array) $path;
 		}
 
@@ -332,7 +332,7 @@ class Checksum_Plugin_Command extends Checksum_Base_Command {
 	 * @return string
 	 */
 	private function get_absolute_path( $path ) {
-		return FP_PLUGIN_DIR . '/' . $path;
+		return FIN_PLUGIN_DIR . '/' . $path;
 	}
 
 	/**
